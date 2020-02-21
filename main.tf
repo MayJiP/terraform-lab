@@ -32,7 +32,7 @@ resource "azurerm_virtual_network" "Demo-network" {
 resource "azurerm_subnet" "Demosubnet" {
     name                 = "DemoSubnet"
     resource_group_name  = azurerm_resource_group.DemoResource-GroupName.name
-    virtual_network_name = azurerm_virtual_network.DemoSubnetnetwork.name
+    virtual_network_name = azurerm_virtual_network.Demo-networkSubnetnetwork.name
     address_prefix       = "10.0.1.0/24"
 }
 
@@ -40,7 +40,7 @@ resource "azurerm_subnet" "Demosubnet" {
 resource "azurerm_public_ip" "Demopublicip" {
     name                         = "DemoPublicIP"
     location                     = "eastus"
-    resource_group_name          = azurerm_resource_group.DemoResource-GroupNam.name
+    resource_group_name          = azurerm_resource_group.DemoResource-GroupName.name
     allocation_method            = "Dynamic"
 
     tags = {
@@ -154,8 +154,3 @@ resource "azurerm_virtual_machine" "DEMOvm" {
         environment = "Terraform G6"
     }
 }
-
-
-
-
-
