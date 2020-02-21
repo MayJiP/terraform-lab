@@ -7,52 +7,52 @@ provider "azurerm" {
 }
 
 # Create a resource group if it doesn’t exist
-resource "azurerm_resource_group" "DemoResource-GroupName" {
+resource "azurerm_resource_group" "DemoResource" {
     name     = "${var.prefix}"
     location = "eastus"
 
     tags = {
-        environment = "Terraform MAY-LAB"
+        environment = "Terraform DemoToday"
     }
 }
 
 # Create virtual network
-resource "azurerm_virtual_network" "Demo-network" {
+resource "azurerm_virtual_network" "Demonetwork" {
     name                = "myVnet"
     address_space       = ["10.0.0.0/16"]
     location            = "eastus"
-    resource_group_name = azurerm_resource_group.DemoResource-GroupName.name
+    resource_group_name = azurerm_resource_group.DemoResource.name
 
     tags = {
-        environment = "Terraform G1"
+        environment = "Terraform DemoToday"
     }
 }
 
 # Create subnet
 resource "azurerm_subnet" "Demosubnet" {
-    name                 = "DemoSubnet"
-    resource_group_name  = azurerm_resource_group.DemoResource-GroupName.name
-    virtual_network_name = azurerm_virtual_network.Demo-networkSubnetnetwork.name
+    name                 = "NameDemoSubnet"
+    resource_group_name  = azurerm_resource_group.DemoResource.name
+    virtual_network_name = azurerm_virtual_network.Demonetworknetwork.name
     address_prefix       = "10.0.1.0/24"
 }
 
 # Create public IPs
 resource "azurerm_public_ip" "Demopublicip" {
-    name                         = "DemoPublicIP"
+    name                         = "NameDemoPublicIP"
     location                     = "eastus"
-    resource_group_name          = azurerm_resource_group.DemoResource-GroupName.name
+    resource_group_name          = azurerm_resource_group.DemoResource.name
     allocation_method            = "Dynamic"
 
     tags = {
-        environment = "Terraform G2"
+        environment = "Terraform DemoToday"
     }
 }
 
 # Create Network Security Group and rule
-resource "azurerm_network_security_group" "DEMOnsg" {
-    name                = "DEMONetworkSecurityGroup"
+resource "azurerm_network_security_group" "Demonsg" {
+    name                = "NameDemoNetworkSecurityGroup"
     location            = "eastus"
-    resource_group_name = azurerm_resource_group.DemoResource-GroupName.name
+    resource_group_name = azurerm_resource_group.DemoResource.name
     
     security_rule {
         name                       = "SSH"
@@ -67,26 +67,26 @@ resource "azurerm_network_security_group" "DEMOnsg" {
     }
 
     tags = {
-        environment = "Terraform G3"
+        environment = "Terraform DemoToday""
     }
 }
 
 # Create network interface
-resource "azurerm_network_interface" "DEMOnic" {
-    name                      = "DEMONIC"
+resource "azurerm_network_interface" "Demonic" {
+    name                      = "NameDemoNIC"
     location                  = "eastus"
-    resource_group_name       = azurerm_resource_group.DemoResource-GroupName.name
-    network_security_group_id = azurerm_network_security_group.DEMOnsg.id
+    resource_group_name       = azurerm_resource_group.DemoResource.name
+    network_security_group_id = azurerm_network_security_group.Demonsg.id
 
     ip_configuration {
-        name                          = "DEMONicConfiguration"
-        subnet_id                     = azurerm_subnet.DEMOsubnet.id
+        name                          = "DemoNicConfiguration"
+        subnet_id                     = azurerm_subnet.Demosubnetsubnet.id
         private_ip_address_allocation = "Dynamic"
-        public_ip_address_id          = azurerm_public_ip.DEMOpublicip.id
+        public_ip_address_id          = azurerm_public_ip.Demopublicippublicip.id
     }
 
     tags = {
-        environment = "Terraform G4"
+        environment = "Terraform DemoToday""
     }
 }
 
@@ -94,35 +94,35 @@ resource "azurerm_network_interface" "DEMOnic" {
 resource "random_id" "randomId" {
     keepers = {
         # Generate a new ID only when a new resource group is defined
-        resource_group = azurerm_resource_group.DemoResource-GroupName.name
+        resource_group = azurerm_resource_group.DemoResource.name
     }
     
     byte_length = 8
 }
 
 # Create storage account for boot diagnostics
-resource "azurerm_storage_account" "DEMOstorageaccount" {
+resource "azurerm_storage_account" "Demostorageaccount" {
     name                        = "diag${random_id.randomId.hex}"
-    resource_group_name         = azurerm_resource_group.DemoResource-GroupName.name
+    resource_group_name         = azurerm_resource_group.DemoResource.name
     location                    = "eastus"
     account_tier                = "Standard"
     account_replication_type    = "LRS"
 
     tags = {
-        environment = "Terraform G5"
+        environment = "Terraform DemoToday""
     }
 }
 
 # Create virtual machine
-resource "azurerm_virtual_machine" "DEMOvm" {
-    name                  = "DEMOVM"
+resource "azurerm_virtual_machine" "Demovm" {
+    name                  = "NameDemoVM"
     location              = "eastus"
-    resource_group_name   = azurerm_resource_group.DemoResource-GroupName.name
-    network_interface_ids = [azurerm_network_interface.DEMOnic.id]
+    resource_group_name   = azurerm_resource_group.DemoResource.name
+    network_interface_ids = [azurerm_network_interface.Demonicnic.id]
     vm_size               = "Standard_DS1_v2"
 
     storage_os_disk {
-        name              = "DEMOOsDisk"
+        name              = "DemoLABOsDisk"
         caching           = "ReadWrite"
         create_option     = "FromImage"
         managed_disk_type = "Premium_LRS"
@@ -136,7 +136,7 @@ resource "azurerm_virtual_machine" "DEMOvm" {
     }
 
     os_profile {
-        computer_name  = "Demo-vm"
+        computer_name  = "Demovm"
         admin_username = "Admin"
         admin_password = "P@ssw0rd1234!"
     }
@@ -147,10 +147,10 @@ resource "azurerm_virtual_machine" "DEMOvm" {
 
     boot_diagnostics {
         enabled = "true"
-        storage_uri = azurerm_storage_account.DEMOstorageaccount.primary_blob_endpoint
+        storage_uri = azurerm_storage_account.Demostorageaccountstorageaccount.primary_blob_endpoint
     }
 
     tags = {
-        environment = "Terraform G6"
+        environment = "Terraform DemoToday""
     }
 }
